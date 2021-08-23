@@ -44,7 +44,7 @@ public class SegmentTree {
      * @param stPos index of segment
      * @return returns the sum of that particular range in segment tree
      */
-    public int buildSGTree(int[] arr, int start, int end, int stPos){
+    private int buildSGTree(int[] arr, int start, int end, int stPos){
         if(start == end){
             segmentTree[stPos] = arr[start];
             return segmentTree[stPos];
@@ -78,7 +78,7 @@ public class SegmentTree {
      * @param si current segment index, initially its on root i.e. 0 index
      * @return return the sum of segment range from segment tree
      */
-    public int getPartitionSum(int ss, int se, int rs, int re, int si){
+    private int getPartitionSum(int ss, int se, int rs, int re, int si){
         if (rs <= ss && re >= se){
             return segmentTree[si];
         }
@@ -88,6 +88,41 @@ public class SegmentTree {
         int mid = (ss + se)/2;
         return getPartitionSum(ss, mid, rs, re, 2 * si + 1) +
                 getPartitionSum(mid+1, se, rs, re, 2 * si + 2);
+    }
+
+    /**
+     * @param inputArr input array
+     * @param index index which needs to be updated
+     * @param newValue new value to be updated on index
+     */
+    public void updateValue(int[] inputArr, int index, int newValue){
+        if(index < 0 || index > inputArr.length-1){
+            throw new IllegalArgumentException("Are you really serious, Stop irritating me");
+        }
+        int diff = newValue - inputArr[index];
+        inputArr[index] = newValue;
+        updatedElement(0, inputArr.length-1, 0, index, diff);
+    }
+
+    /**
+     * @param ss segment start index
+     * @param se segment end index
+     * @param si segment current index
+     * @param index index of element in input array to udpate
+     * @param diff diff between old value and new Value
+     */
+    private void updatedElement(int ss, int se, int si, int index, int diff){
+
+        if(index < ss || index > se){
+            return;
+        }
+        segmentTree[si] = segmentTree[si] + diff;
+
+        if(se != ss){
+            int mid = (ss + se)/2;
+            updatedElement(ss, mid, 2 * si + 1, index, diff);
+            updatedElement(mid+1, se, 2 * si + 2, index, diff);
+        }
     }
 
     public static void main(String[] args){
@@ -107,6 +142,20 @@ public class SegmentTree {
                 + (segmentTree.getSum(inputArr,0, 5) == 121 ? "PASSED" : "FAILED"));
         System.out.println("Test 6 :"
                 + (segmentTree.getSum(inputArr,8, inputArr.length-1) == 2107 ? "PASSED" : "FAILED"));
+
+        segmentTree.updateValue(inputArr, 5, 4);
+        System.out.println("Value at Index 5 is updated Old Value: 34, New Value: 4");
+
+        System.out.println("Test 7 :"
+                + (segmentTree.getSum(inputArr,5, 5) == 4 ? "PASSED" : "FAILED"));
+        System.out.println("Test 8 :"
+                + (segmentTree.getSum(inputArr,0, 5) == 91 ? "PASSED" : "FAILED"));
+        System.out.println("Test 9 :"
+                + (segmentTree.getSum(inputArr,3, 7) == 362 ? "PASSED" : "FAILED"));
+        System.out.println("Test 10 :"
+                + (segmentTree.getSum(inputArr,2, 12) == 1314 ? "PASSED" : "FAILED"));
+        System.out.println("Test 11 :"
+                + (segmentTree.getSum(inputArr,0, inputArr.length-1) == 2475 ? "PASSED" : "FAILED"));
 
         System.out.println("Program Ends");
     }
